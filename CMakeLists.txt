@@ -10,6 +10,10 @@ include(CPack)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
+enable_testing()
+
 add_subdirectory(deps/cxxopts)
+add_subdirectory(deps/gtest)
 add_subdirectory(lib)
+add_subdirectory(test)
 add_subdirectory(cli)
