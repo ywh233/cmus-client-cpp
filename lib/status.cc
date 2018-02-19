@@ -1,5 +1,5 @@
 //******************************************
-//  Author : Yuwei Huang   
+//  Author : Yuwei Huang
 //  Created On : Sun Feb 18 2018
 //  File : status.cc
 //******************************************
@@ -15,6 +15,9 @@ namespace cmusclient {
 
 namespace {
 
+// G1: status
+const std::regex kStatusExp(R"exp(^status (.*)$)exp");
+
 // G1: filename
 const std::regex kFileExp(R"exp(^file (.*)$)exp");
 
@@ -29,6 +32,16 @@ const std::regex kTagExp(R"exp(^tag (\S+) (.*)$)exp");
 
 // G1: Key, G2: Value
 const std::regex kSettingExp(R"exp(^set (\S+) (.*)$)exp");
+
+void SetPlayerStatus(Status* status, const std::string& player_status) {
+  if (player_status == "stopped") {
+    status->status = Status::PlayerStatus::STOPPED;
+  } else if (player_status == "playing") {
+    status->status = Status::PlayerStatus::PLAYING;
+  } else if (player_status == "paused") {
+    status->status = Status::PlayerStatus::PAUSED;
+  }
+}
 
 void SetTag(Status* status, const std::string& key, const std::string& value) {
   if (key == "album") {
@@ -56,6 +69,12 @@ Status Status::ParseStatus(const std::string& str) {
   Status status;
 
   while (std::getline(stream, line)) {
+    std::smatch status_match;
+    if (std::regex_search(line, status_match, kStatusExp)) {
+      SetPlayerStatus(&status, status_match[1]);
+      continue;
+    }
+
     std::smatch file_match;
     if (std::regex_search(line, file_match, kFileExp)) {
       status.filename = file_match[1];

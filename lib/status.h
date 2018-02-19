@@ -13,6 +13,12 @@
 namespace cmusclient {
 
 struct Status {
+  enum class PlayerStatus {
+    STOPPED,
+    PLAYING,
+    PAUSED,
+  };
+
   struct Tags {
     std::string album;
     std::string artist;
@@ -25,6 +31,7 @@ struct Status {
 
   static Status ParseStatus(const std::string& str);
 
+  PlayerStatus status = PlayerStatus::STOPPED;
   std::string filename;
   int duration = 0;
   int position = 0;

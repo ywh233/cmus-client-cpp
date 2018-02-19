@@ -23,16 +23,33 @@ void PrintStatus(std::unique_ptr<ConnectionInterface>&& interface,
     CmusClient client(std::move(interface), passwd);
 
     Status status = client.GetStatus();
-    std::cout << "file: " << status.filename << std::endl
-              << "duration: " << status.duration << std::endl
-              << "position: " << status.position << std::endl
-              << "tag title: " << status.tags.title << std::endl
-              << "tag artist: " << status.tags.artist << std::endl
-              << "tag album: " << status.tags.album << std::endl
-              << "tag tracknumber: " << status.tags.tracknumber << std::endl
-              << "tag date: " << status.tags.date << std::endl
-              << "tag genre: " << status.tags.genre << std::endl
-              << "tag comment: " << status.tags.comment << std::endl;
+    std::cout << "status ";
+    switch (status.status) {
+      case Status::PlayerStatus::STOPPED:
+        std::cout << "stopped";
+        break;
+      case Status::PlayerStatus::PLAYING:
+        std::cout << "playing";
+        break;
+      case Status::PlayerStatus::PAUSED:
+        std::cout << "paused";
+        break;
+      default:
+        std::cerr << "Unknown player status.";
+        exit(1);
+    }
+    std::cout << std::endl;
+
+    std::cout << "file " << status.filename << std::endl
+              << "duration " << status.duration << std::endl
+              << "position " << status.position << std::endl
+              << "tag title " << status.tags.title << std::endl
+              << "tag artist " << status.tags.artist << std::endl
+              << "tag album " << status.tags.album << std::endl
+              << "tag tracknumber " << status.tags.tracknumber << std::endl
+              << "tag date " << status.tags.date << std::endl
+              << "tag genre " << status.tags.genre << std::endl
+              << "tag comment " << status.tags.comment << std::endl;
 
     for (const auto& kv : status.settings) {
       std::cout << "set " << kv.first << " " << kv.second << std::endl;
