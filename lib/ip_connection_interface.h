@@ -11,6 +11,7 @@
 #include <asio/ip/tcp.hpp>
 
 #include "connection_interface.h"
+#include "string_buffer.h"
 
 namespace cmusclient {
 
@@ -24,13 +25,11 @@ class IpConnectionInterface : public ConnectionInterface {
   std::string Receive() override;
 
  private:
-  static constexpr int kReceiveBufferSize = 4096;
-
   asio::io_service service_;
   asio::ip::tcp::socket socket_{service_};
   asio::ip::tcp::resolver resolver_{service_};
 
-  char receive_buffer_[kReceiveBufferSize];
+  StringBuffer receive_buffer_;
 
   IpConnectionInterface(const IpConnectionInterface&) = delete;
   IpConnectionInterface(IpConnectionInterface&&) = delete;

@@ -6,26 +6,28 @@
 
 #include "cmus_client.h"
 
+#include <assert.h>
 #include <asio.hpp>
 
-#include<iostream>
+#include <iostream>
+
+#include "exceptions.h"
 
 namespace cmusclient {
 
-CmusClient::CmusClient(std::unique_ptr<ConnectionInterface>&& interface) {
-  interface_ = std::move(interface);
+CmusClient::CmusClient(std::unique_ptr<ConnectionInterface>&& interface,
+                       const std::string& password)
+    : interface_(std::move(interface)) {
+  assert (interface_);
+
+  std::string check_authentication_reply = SendCommandAndGetReply(
+      password.empty() ? "status" : "passwd " + password);
+  if (check_authentication_reply.find("authentication failed") == 0) {
+    throw AuthenticationError();
+  }
 }
 
 CmusClient::~CmusClient() {}
-
-bool CmusClient::IsAuthenticated() {
-  std::string reply = SendCommandAndGetReply("status");
-  return reply.find("authentication failed") != 0;
-}
-
-void CmusClient::SetPassword(const std::string& password) {
-  ProcessCommand("passwd " + password);
-}
 
 Status CmusClient::GetStatus() {
   return Status::ParseStatus(SendCommandAndGetReply("status"));
@@ -71,14 +73,16 @@ void CmusClient::SetVolume(const std::string& volume) {
 
 std::string CmusClient::SendCommandAndGetReply(const std::string& command) {
   interface_->Send(command + '\n');
-  return interface_->Receive();
+  std::string reply = interface_->Receive();
+  static const std::string error_prefix = "Error: ";
+  if (reply.find(error_prefix) == 0) {
+    throw CommandError(reply.substr(error_prefix.length()));
+  }
+  return reply;
 }
 
 void CmusClient::ProcessCommand(const std::string& command) {
-  std::string result = SendCommandAndGetReply(command);
-  if (!result.empty()) {
-    std::cerr << result << std::endl;
-  }
+  SendCommandAndGetReply(command);
 }
 
 }  // namespace cmusclient

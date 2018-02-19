@@ -4,10 +4,14 @@ add_library(cmusclient
     cmus_client.cc
     cmus_client.h
     connection_interface.h
+    exceptions.cc
+    exceptions.h
     ip_connection_interface.cc
     ip_connection_interface.h
     status.cc
     status.h
+    string_buffer.cc
+    string_buffer.h
     unix_connection_interface.cc
     unix_connection_interface.h
 )

@@ -44,9 +44,8 @@ void UnixConnectionInterface::Send(const std::string& message) {
 }
 
 std::string UnixConnectionInterface::Receive() {
-  socket_.receive(asio::buffer(receive_buffer_, kReceiveBufferSize));
-
-  return std::string(receive_buffer_, kReceiveBufferSize);
+  socket_.receive(receive_buffer_.GetBuffer());
+  return receive_buffer_.GetString();
 }
 
 }  // namespace cmusclient

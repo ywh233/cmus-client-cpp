@@ -16,11 +16,10 @@ namespace cmusclient {
 
 class CmusClient {
  public:
-  explicit CmusClient(std::unique_ptr<ConnectionInterface>&& interface);
+  // Throws |AuthenticationError| if the password is invalid.
+  explicit CmusClient(std::unique_ptr<ConnectionInterface>&& interface,
+                      const std::string& password);
   ~CmusClient();
-
-  bool IsAuthenticated();
-  void SetPassword(const std::string& password);
 
   Status GetStatus();
 

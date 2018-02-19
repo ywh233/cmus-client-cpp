@@ -1,5 +1,5 @@
 //******************************************
-//  Author : Yuwei Huang   
+//  Author : Yuwei Huang
 //  Created On : Sun Feb 18 2018
 //  File : status.cc
 //******************************************
@@ -11,6 +11,7 @@
 #include <system_error>
 
 #include "lib/cmus_client.h"
+#include "lib/exceptions.h"
 #include "lib/ip_connection_interface.h"
 #include "lib/unix_connection_interface.h"
 
@@ -18,31 +19,26 @@ using namespace cmusclient;
 
 void PrintStatus(std::unique_ptr<ConnectionInterface>&& interface,
                  const std::string& passwd) {
-  CmusClient client(std::move(interface));
+  try {
+    CmusClient client(std::move(interface), passwd);
 
-  if (!passwd.empty()) {
-    client.SetPassword(passwd);
-  }
+    Status status = client.GetStatus();
+    std::cout << "file: " << status.filename << std::endl
+              << "duration: " << status.duration << std::endl
+              << "position: " << status.position << std::endl
+              << "tag title: " << status.tags.title << std::endl
+              << "tag artist: " << status.tags.artist << std::endl
+              << "tag album: " << status.tags.album << std::endl
+              << "tag tracknumber: " << status.tags.tracknumber << std::endl
+              << "tag date: " << status.tags.date << std::endl
+              << "tag genre: " << status.tags.genre << std::endl
+              << "tag comment: " << status.tags.comment << std::endl;
 
-  if (!client.IsAuthenticated()) {
-    std::cerr << "Authentication failed." << std::endl;
-    exit(1);
-  }
-
-  Status status = client.GetStatus();
-  std::cout << "file: " << status.filename << std::endl
-            << "duration: " << status.duration << std::endl
-            << "position: " << status.position << std::endl
-            << "tag title: " << status.tags.title << std::endl
-            << "tag artist: " << status.tags.artist << std::endl
-            << "tag album: " << status.tags.album << std::endl
-            << "tag tracknumber: " << status.tags.tracknumber << std::endl
-            << "tag date: " << status.tags.date << std::endl
-            << "tag genre: " << status.tags.genre << std::endl
-            << "tag comment: " << status.tags.comment << std::endl;
-
-  for (const auto& kv : status.settings) {
-    std::cout << "set " << kv.first << " " << kv.second << std::endl;
+    for (const auto& kv : status.settings) {
+      std::cout << "set " << kv.first << " " << kv.second << std::endl;
+    }
+  } catch (const AuthenticationError& err) {
+    std::cerr << err.what() << std::endl;
   }
 }
 
@@ -64,6 +60,7 @@ int main(int argc, char** argv) {
 
   std::unique_ptr<ConnectionInterface> interface;
   std::string passwd;
+
   try {
     auto result = options.parse(argc, argv);
 

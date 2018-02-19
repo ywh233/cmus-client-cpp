@@ -11,6 +11,7 @@
 #include <asio/local/stream_protocol.hpp>
 
 #include "connection_interface.h"
+#include "string_buffer.h"
 
 namespace cmusclient {
 
@@ -29,12 +30,10 @@ class UnixConnectionInterface : public ConnectionInterface {
   std::string Receive() override;
 
  private:
-  static constexpr int kReceiveBufferSize = 4096;
-
   asio::io_service service_;
   asio::local::stream_protocol::socket socket_{service_};
 
-  char receive_buffer_[kReceiveBufferSize];
+  StringBuffer receive_buffer_;
 
   UnixConnectionInterface(const UnixConnectionInterface&) = delete;
   UnixConnectionInterface(UnixConnectionInterface&&) = delete;
