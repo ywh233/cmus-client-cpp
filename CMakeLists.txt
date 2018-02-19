@@ -10,5 +10,6 @@ include(CPack)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
+add_subdirectory(deps/cxxopts)
 add_subdirectory(lib)
 add_subdirectory(cli)

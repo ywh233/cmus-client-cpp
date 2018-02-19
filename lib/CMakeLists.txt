@@ -1,4 +1,4 @@
-include(${PROJECT_SOURCE_DIR}//deps/asio.cmake)
+include(${PROJECT_SOURCE_DIR}/deps/asio.cmake)
 
 add_library(cmusclient
     cmus_client.cc
