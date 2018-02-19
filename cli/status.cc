@@ -16,8 +16,18 @@
 
 using namespace cmusclient;
 
-void PrintStatus(std::unique_ptr<ConnectionInterface>&& interface) {
+void PrintStatus(std::unique_ptr<ConnectionInterface>&& interface,
+                 const std::string& passwd) {
   CmusClient client(std::move(interface));
+
+  if (!passwd.empty()) {
+    client.SetPassword(passwd);
+  }
+
+  if (!client.IsAuthenticated()) {
+    std::cerr << "Authentication failed." << std::endl;
+    exit(1);
+  }
 
   Status status = client.GetStatus();
   std::cout << "file: " << status.filename << std::endl
@@ -44,14 +54,16 @@ void ShowHelp(const cxxopts::Options& options, int exit_code) {
 int main(int argc, char** argv) {
   cxxopts::Options options(
       argv[0], "cmus status printer. Similar to \"cmus-remote -Q\"");
-  options.add_options()("n,hostname", "Host name of the server that runs cmus. "
-                        "Must be used with the port.",
-                        cxxopts::value<std::string>(), "HOSTNAME")(
-      "p,port", "Port to listen to.", cxxopts::value<std::string>(), "PORT")(
-      "h,help", "Print help");
+  options.add_options()
+      ("hostname",
+          "Host name of the server that runs cmus. Must be used with the port.",
+          cxxopts::value<std::string>(), "HOSTNAME")
+      ("port", "Port to listen to.", cxxopts::value<std::string>(), "PORT")
+      ("passwd", "Password.",cxxopts::value<std::string>(), "PASSWD")
+      ("h,help", "Print help");
 
   std::unique_ptr<ConnectionInterface> interface;
-
+  std::string passwd;
   try {
     auto result = options.parse(argc, argv);
 
@@ -77,12 +89,17 @@ int main(int argc, char** argv) {
       std::cerr << "Failed to open connection: " << err.what() << std::endl;
       exit(1);
     }
+
+    if (result.count("passwd")) {
+      passwd = result["passwd"].as<std::string>();
+    }
+
   } catch (const cxxopts::OptionException& e) {
     std::cerr << "Error parsing options: " << e.what() << std::endl;
     ShowHelp(options, 1);
   }
 
-  PrintStatus(std::move(interface));
+  PrintStatus(std::move(interface), passwd);
 
   return 0;
 }

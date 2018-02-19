@@ -18,6 +18,15 @@ CmusClient::CmusClient(std::unique_ptr<ConnectionInterface>&& interface) {
 
 CmusClient::~CmusClient() {}
 
+bool CmusClient::IsAuthenticated() {
+  std::string reply = SendCommandAndGetReply("status");
+  return reply.find("authentication failed") != 0;
+}
+
+void CmusClient::SetPassword(const std::string& password) {
+  ProcessCommand("passwd " + password);
+}
+
 Status CmusClient::GetStatus() {
   return Status::ParseStatus(SendCommandAndGetReply("status"));
 }

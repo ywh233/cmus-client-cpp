@@ -19,6 +19,9 @@ class CmusClient {
   explicit CmusClient(std::unique_ptr<ConnectionInterface>&& interface);
   ~CmusClient();
 
+  bool IsAuthenticated();
+  void SetPassword(const std::string& password);
+
   Status GetStatus();
 
   void Play();

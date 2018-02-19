@@ -26,8 +26,8 @@ struct Status {
   static Status ParseStatus(const std::string& str);
 
   std::string filename;
-  int duration;
-  int position;
+  int duration = 0;
+  int position = 0;
 
   Tags tags;
 
