@@ -4,24 +4,19 @@
 //  File : status.cc
 //******************************************
 
-#include <memory>
+#include <cxxopts.hpp>
 
 #include <iostream>
+#include <memory>
 #include <system_error>
 
 #include "lib/cmus_client.h"
+#include "lib/ip_connection_interface.h"
 #include "lib/unix_connection_interface.h"
 
 using namespace cmusclient;
 
-int main() {
-  std::unique_ptr<UnixConnectionInterface> interface;
-  try {
-    interface.reset(new UnixConnectionInterface());
-  } catch(const std::system_error& err) {
-    std::cerr << "Failed to open connection: " << err.what() << std::endl;
-    return 1;
-  }
+void PrintStatus(std::unique_ptr<ConnectionInterface>&& interface) {
   CmusClient client(std::move(interface));
 
   Status status = client.GetStatus();
@@ -35,9 +30,59 @@ int main() {
             << "tag date: " << status.tags.date << std::endl
             << "tag genre: " << status.tags.genre << std::endl
             << "tag comment: " << status.tags.comment << std::endl;
-  
+
   for (const auto& kv : status.settings) {
     std::cout << "set " << kv.first << " " << kv.second << std::endl;
   }
+}
+
+void ShowHelp(const cxxopts::Options& options, int exit_code) {
+  std::cout << options.help({""}) << std::endl;
+  exit(exit_code);
+}
+
+int main(int argc, char** argv) {
+  cxxopts::Options options(
+      argv[0], "cmus status printer. Similar to \"cmus-remote -Q\"");
+  options.add_options()("n,hostname", "Host name of the server that runs cmus. "
+                        "Must be used with the port.",
+                        cxxopts::value<std::string>(), "HOSTNAME")(
+      "p,port", "Port to listen to.", cxxopts::value<std::string>(), "PORT")(
+      "h,help", "Print help");
+
+  std::unique_ptr<ConnectionInterface> interface;
+
+  try {
+    auto result = options.parse(argc, argv);
+
+    // Help
+    if (result.count("h")) {
+      ShowHelp(options, 0);
+    }
+
+    try {
+      if (result.count("hostname")) {
+        if (!result.count("port")) {
+          std::cerr << "--hostname and --port must both be set." << std::endl;
+          ShowHelp(options, 1);
+        }
+
+        std::string hostname = result["hostname"].as<std::string>();
+        std::string port = result["port"].as<std::string>();
+        interface.reset(new IpConnectionInterface(hostname, port));
+      } else {
+        interface.reset(new UnixConnectionInterface());
+      }
+    } catch (const std::system_error& err) {
+      std::cerr << "Failed to open connection: " << err.what() << std::endl;
+      exit(1);
+    }
+  } catch (const cxxopts::OptionException& e) {
+    std::cerr << "Error parsing options: " << e.what() << std::endl;
+    ShowHelp(options, 1);
+  }
+
+  PrintStatus(std::move(interface));
+
   return 0;
 }
