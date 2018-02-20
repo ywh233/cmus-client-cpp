@@ -16,6 +16,15 @@ namespace cmusclient {
 
 class CmusClient {
  public:
+  // Connects to the default unix socket, i.e. ~/.config/cmus/socket
+  CmusClient();
+
+  // Connects to the player via TCP/IP.
+  CmusClient(const std::string& hostname,
+             const std::string& port,
+             const std::string& password);
+
+  // Connects to the player using a custom connection interface.
   // Throws |AuthenticationError| if the password is invalid.
   explicit CmusClient(std::unique_ptr<ConnectionInterface>&& interface,
                       const std::string& password);

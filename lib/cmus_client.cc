@@ -1,5 +1,5 @@
 //******************************************
-//  Author : Yuwei Huang   
+//  Author : Yuwei Huang
 //  Created On : Fri Feb 16 2018
 //  File : cmus_client.cc
 //******************************************
@@ -12,8 +12,22 @@
 #include <iostream>
 
 #include "exceptions.h"
+#include "ip_connection_interface.h"
+#include "unix_connection_interface.h"
 
 namespace cmusclient {
+
+CmusClient::CmusClient()
+    : CmusClient(std::unique_ptr<ConnectionInterface>(
+        new UnixConnectionInterface()), "") {}
+
+CmusClient::CmusClient(const std::string& hostname,
+                       const std::string& port,
+                       const std::string& password)
+    : CmusClient(
+          std::unique_ptr<ConnectionInterface>(
+              new IpConnectionInterface(hostname, port)),
+          password) {}
 
 CmusClient::CmusClient(std::unique_ptr<ConnectionInterface>&& interface,
                        const std::string& password)
