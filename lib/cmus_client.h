@@ -48,6 +48,12 @@ class CmusClient {
   void Next();
   void Previous();
 
+  // Selects a track on current view that has the matching string.
+  void Search(const std::string& str);
+
+  // Presses Enter on current view.
+  void Activate();
+
   // |position|: e.g. 10 (seconds), or 1:15.
   void Seek(const std::string& position);
 

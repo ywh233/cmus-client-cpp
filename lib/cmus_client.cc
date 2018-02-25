@@ -89,6 +89,14 @@ void CmusClient::Previous() {
   ProcessCommand("player-prev");
 }
 
+void CmusClient::Search(const std::string& str) {
+  ProcessCommand("/" + str);
+}
+
+void CmusClient::Activate() {
+  ProcessCommand("win-activate");
+}
+
 void CmusClient::Seek(const std::string& position) {
   ProcessCommand("seek " + position);
 }
