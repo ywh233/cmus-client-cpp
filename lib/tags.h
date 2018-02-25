@@ -20,7 +20,9 @@ struct Tags {
   std::string title;
   std::string tracknumber;
 
-  static Tags ParseTags(const std::string& str);
+  // Parses one line and writes it to tags if it is a valid tag. Returns true if
+  // the line is a valid tag.
+  static bool ParseOneLineTag(const std::string& line, Tags* tags);
 };
 
 }

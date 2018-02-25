@@ -46,6 +46,10 @@ Status Status::ParseStatus(const std::string& str) {
   Status status;
 
   while (std::getline(stream, line)) {
+    if (Tags::ParseOneLineTag(line, &status.tags)) {
+      continue;
+    }
+
     std::smatch status_match;
     if (std::regex_search(line, status_match, kStatusExp)) {
       SetPlayerStatus(&status, status_match[1]);
@@ -75,7 +79,6 @@ Status Status::ParseStatus(const std::string& str) {
       status.settings[setting_match[1]] = setting_match[2];
     }
   }
-  status.tags = Tags::ParseTags(str);
   return status;
 }
 

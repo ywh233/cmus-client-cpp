@@ -20,7 +20,7 @@ const char kAuthenticationFailedText[] = "authentication failed\n";
 
 const char kStatusText[] = R"(
 status playing
-file /Volumes/HDD_Data/Media/Music/Older Music/Secret Garden/Songs from a Secret Garden/05 Papillon.mp3
+file /Media/Music/Songs from a Secret Garden/05 Papillon.mp3
 duration 208
 position 4
 tag tracknumber 5
@@ -42,6 +42,27 @@ set shuffle false
 set softvol false
 set vol_left 100
 set vol_right 100)";
+
+const char kListText[] = R"(
+file /Media/Music/Alice in Wonderworld/mugs feat.630.mp3
+duration 318
+codec mp3
+bitrate 329999
+tag tracknumber 2
+tag title mugs feat.630
+tag artist 古川本舗
+tag album Alice in Wonderword
+tag comment Other
+file /Media/Music/FZ- Side Z (FEZ) (2013) [FLAC]/05 - Pressure.flac
+duration 210
+codec flac
+bitrate 988599
+tag album FZ: Side Z
+tag albumartist Various Artists
+tag artist bignic
+tag date 2013
+tag title Pressure
+tag tracknumber 5)";
 
 class MockConnectionInterface : public ConnectionInterface {
  public:
@@ -153,6 +174,38 @@ TEST_F(CmusClientTest, GetStatus_parsedProperly) {
   EXPECT_EQ("true", status.settings["play_library"]);
   EXPECT_EQ("0.000000", status.settings["replaygain_preamp"]);
   EXPECT_EQ("100", status.settings["vol_left"]);
+}
+
+TEST_F(CmusClientTest, GetList_empty) {
+  ExpectSendAndReply("status\n", kStatusText);
+  CmusClient client(std::move(owned_interface_), "");
+
+  ExpectSendAndReply("save -l -e -\n", "");
+  std::vector<Metadata> metadata_list =
+      client.GetList(CmusClient::View::LIBRARY);
+
+  EXPECT_EQ(0u, metadata_list.size());
+}
+
+TEST_F(CmusClientTest, GetList_returnsTwoRecords) {
+  ExpectSendAndReply("status\n", kStatusText);
+  CmusClient client(std::move(owned_interface_), "");
+
+  ExpectSendAndReply("save -l -e -\n", kListText);
+  std::vector<Metadata> metadata_list =
+      client.GetList(CmusClient::View::LIBRARY);
+
+  EXPECT_EQ(2u, metadata_list.size());
+  EXPECT_EQ(318, metadata_list[0].duration);
+  EXPECT_EQ("mp3", metadata_list[0].codec);
+  EXPECT_EQ(329999, metadata_list[0].bitrate);
+  EXPECT_EQ("2", metadata_list[0].tags.tracknumber);
+
+  EXPECT_EQ(210, metadata_list[1].duration);
+  EXPECT_EQ("flac", metadata_list[1].codec);
+  EXPECT_EQ(988599, metadata_list[1].bitrate);
+  EXPECT_EQ("Pressure", metadata_list[1].tags.title);
+  EXPECT_EQ("bignic", metadata_list[1].tags.artist);
 }
 
 }  // namespace cmusclient

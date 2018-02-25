@@ -47,6 +47,28 @@ Status CmusClient::GetStatus() {
   return Status::ParseStatus(SendCommandAndGetReply("status"));
 }
 
+std::vector<Metadata> CmusClient::GetList(View view) {
+  std::string command = "save ";
+  switch (view) {
+    case View::LIBRARY:
+      command += "-l";
+      break;
+    case View::FILTERED_LIBRARY:
+      command += "-L";
+    case View::PLAYLIST:
+      command += "-p";
+      break;
+    case View::QUEUE:
+      command += "-q";
+      break;
+    default:
+      assert(false);
+      return {};
+  }
+  command += " -e -";
+  return Metadata::ParseMetadataList(SendCommandAndGetReply(command));
+}
+
 void CmusClient::Play() {
   ProcessCommand("player-play");
 }

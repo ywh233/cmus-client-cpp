@@ -37,18 +37,13 @@ void SetTag(Tags* tags, const std::string& key, const std::string& value) {
 }  // namespace
 
 // static
-Tags Tags::ParseTags(const std::string& str) {
-  std::istringstream stream(str);
-  std::string line;
-  Tags tags;
-
-  while (std::getline(stream, line)) {
-    std::smatch tag_match;
-    if (std::regex_search(line, tag_match, kTagExp)) {
-      SetTag(&tags, tag_match[1], tag_match[2]);
-    }
+bool Tags::ParseOneLineTag(const std::string& line, Tags* tags) {
+  std::smatch tag_match;
+  if (std::regex_search(line, tag_match, kTagExp)) {
+    SetTag(tags, tag_match[1], tag_match[2]);
+    return true;
   }
-  return tags;
+  return false;
 }
 
 }  // namespace cmusclient

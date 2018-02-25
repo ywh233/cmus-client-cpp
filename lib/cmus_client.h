@@ -10,12 +10,20 @@
 #include <memory>
 
 #include "connection_interface.h"
+#include "metadata.h"
 #include "status.h"
 
 namespace cmusclient {
 
 class CmusClient {
  public:
+  enum class View {
+    LIBRARY,
+    FILTERED_LIBRARY,
+    PLAYLIST,
+    QUEUE,
+  };
+
   // Connects to the default unix socket, i.e. ~/.config/cmus/socket
   CmusClient();
 
@@ -31,6 +39,8 @@ class CmusClient {
   ~CmusClient();
 
   Status GetStatus();
+
+  std::vector<Metadata> GetList(View view);
 
   void Play();
   void Pause();

@@ -8,6 +8,8 @@ add_library(cmusclient
     exceptions.h
     ip_connection_interface.cc
     ip_connection_interface.h
+    metadata.cc
+    metadata.h
     status.cc
     status.h
     string_buffer.cc
