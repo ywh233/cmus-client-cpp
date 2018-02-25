@@ -1,5 +1,5 @@
 //******************************************
-//  Author : Yuwei Huang   
+//  Author : Yuwei Huang
 //  Created On : Mon Feb 19 2018
 //  File : string_buffer.h
 //******************************************
@@ -9,17 +9,44 @@
 
 #include <asio.hpp>
 
+#include <stdexcept>
+
 namespace cmusclient {
 
 class StringBuffer {
  public:
-  StringBuffer();
-  ~StringBuffer();
+  StringBuffer() = default;
+  ~StringBuffer() = default;
 
-  asio::mutable_buffers_1 GetBuffer();
-  char* GetBufferData();
-  size_t GetStringLength() const;
-  std::string GetString() const;
+  template <typename SocketType>
+  std::string ReadFromSocket(SocketType* socket) {
+    std::string output;
+    auto buffer = asio::buffer(buffer_, kBufferSize);
+    while (true) {
+      size_t received_length = socket->receive(buffer);
+      if (received_length == 0) {
+        throw std::runtime_error("Unexpected EOL");
+      }
+
+      output += std::string(buffer_, received_length);
+
+      // cmus reply has two ending pattern, single \n character or two
+      // consecutive \n's.
+      if (output.length() == 1) {
+        if (output.front() == '\n') {
+          break;
+        }
+        continue;
+      }
+
+      assert(output.length() > 1);
+      auto iter = output.cend();
+      if (*(iter - 1) == '\n' && *(iter - 2) == '\n') {
+        break;
+      }
+    }
+    return output;
+  }
 
  private:
   static constexpr size_t kBufferSize = 4096;

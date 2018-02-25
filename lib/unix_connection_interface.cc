@@ -1,5 +1,5 @@
 //******************************************
-//  Author : Author   
+//  Author : Author
 //  Created On : Sun Feb 18 2018
 //  File : unix_connection_interface.cc.cc
 //******************************************
@@ -44,8 +44,7 @@ void UnixConnectionInterface::Send(const std::string& message) {
 }
 
 std::string UnixConnectionInterface::Receive() {
-  socket_.receive(receive_buffer_.GetBuffer());
-  return receive_buffer_.GetString();
+  return receive_buffer_.ReadFromSocket(&socket_);
 }
 
 }  // namespace cmusclient

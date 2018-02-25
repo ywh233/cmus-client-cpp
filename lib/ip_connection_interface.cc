@@ -1,10 +1,12 @@
 //******************************************
-//  Author : Yuwei Huang   
+//  Author : Yuwei Huang
 //  Created On : Sun Feb 18 2018
 //  File : ip_connection_interface.cc
 //******************************************
 
 #include "ip_connection_interface.h"
+
+#include <utility>
 
 namespace cmusclient {
 
@@ -20,8 +22,7 @@ void IpConnectionInterface::Send(const std::string& message) {
 }
 
 std::string IpConnectionInterface::Receive() {
-  socket_.receive(receive_buffer_.GetBuffer());
-  return receive_buffer_.GetString();
+  return receive_buffer_.ReadFromSocket(&socket_);
 }
 
 }  // namespace cmusclient

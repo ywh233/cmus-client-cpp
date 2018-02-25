@@ -12,7 +12,6 @@ add_library(cmusclient
     metadata.h
     status.cc
     status.h
-    string_buffer.cc
     string_buffer.h
     tags.cc
     tags.h
