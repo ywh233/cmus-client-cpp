@@ -10,6 +10,8 @@
 #include <map>
 #include <string>
 
+#include "tags.h"
+
 namespace cmusclient {
 
 struct Status {
@@ -17,16 +19,6 @@ struct Status {
     STOPPED,
     PLAYING,
     PAUSED,
-  };
-
-  struct Tags {
-    std::string album;
-    std::string artist;
-    std::string comment;
-    std::string date;
-    std::string genre;
-    std::string title;
-    std::string tracknumber;
   };
 
   static Status ParseStatus(const std::string& str);

@@ -12,6 +12,8 @@ add_library(cmusclient
     status.h
     string_buffer.cc
     string_buffer.h
+    tags.cc
+    tags.h
     unix_connection_interface.cc
     unix_connection_interface.h
 )

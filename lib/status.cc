@@ -9,8 +9,6 @@
 #include <regex>
 #include <sstream>
 
-#include <iostream>
-
 namespace cmusclient {
 
 namespace {
@@ -28,9 +26,6 @@ const std::regex kDurationExp(R"exp(^duration (.*)$)exp");
 const std::regex kPositionExp(R"exp(^position (.*)$)exp");
 
 // G1: Key, G2: Value
-const std::regex kTagExp(R"exp(^tag (\S+) (.*)$)exp");
-
-// G1: Key, G2: Value
 const std::regex kSettingExp(R"exp(^set (\S+) (.*)$)exp");
 
 void SetPlayerStatus(Status* status, const std::string& player_status) {
@@ -40,24 +35,6 @@ void SetPlayerStatus(Status* status, const std::string& player_status) {
     status->status = Status::PlayerStatus::PLAYING;
   } else if (player_status == "paused") {
     status->status = Status::PlayerStatus::PAUSED;
-  }
-}
-
-void SetTag(Status* status, const std::string& key, const std::string& value) {
-  if (key == "album") {
-    status->tags.album = value;
-  } else if (key == "artist") {
-    status->tags.artist = value;
-  } else if (key == "comment") {
-    status->tags.comment = value;
-  } else if (key == "date") {
-    status->tags.date = value;
-  } else if (key == "genre") {
-    status->tags.genre = value;
-  } else if (key == "title") {
-    status->tags.title = value;
-  } else if (key == "tracknumber") {
-    status->tags.tracknumber = value;
   }
 }
 
@@ -93,17 +70,12 @@ Status Status::ParseStatus(const std::string& str) {
       continue;
     }
 
-    std::smatch tag_match;
-    if (std::regex_search(line, tag_match, kTagExp)) {
-      SetTag(&status, tag_match[1], tag_match[2]);
-      continue;
-    }
-
     std::smatch setting_match;
     if (std::regex_search(line, setting_match, kSettingExp)) {
       status.settings[setting_match[1]] = setting_match[2];
     }
   }
+  status.tags = Tags::ParseTags(str);
   return status;
 }
 
