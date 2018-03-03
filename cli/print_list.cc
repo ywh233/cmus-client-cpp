@@ -18,11 +18,11 @@ using namespace cmusclient;
 
 void PrintList(std::unique_ptr<ConnectionInterface>&& interface,
                const std::string& passwd,
-               CmusClient::View view) {
+               CmusClient::MetadataListSource source) {
   try {
     CmusClient client(std::move(interface), passwd);
 
-    std::vector<Metadata> list = client.GetList(view);
+    std::vector<Metadata> list = client.GetMetadataList(source);
 
     for (const auto& data : list) {
       std::cout << "file " << data.filename << std::endl
@@ -50,19 +50,20 @@ int main(int argc, char** argv) {
   std::unique_ptr<ConnectionInterface> interface;
   auto parse_result =
       ParseArgsAndConnect(&options, argc, argv, &interface, &passwd);
-  CmusClient::View view = CmusClient::View::LIBRARY;
+  CmusClient::MetadataListSource source =
+      CmusClient::MetadataListSource::LIBRARY;
   if (parse_result->count("l")) {
-    view = CmusClient::View::LIBRARY;
+    source = CmusClient::MetadataListSource::LIBRARY;
   } else if (parse_result->count("L")) {
-    view = CmusClient::View::FILTERED_LIBRARY;
+    source = CmusClient::MetadataListSource::FILTERED_LIBRARY;
   } else if (parse_result->count("p")) {
-    view = CmusClient::View::PLAYLIST;
+    source = CmusClient::MetadataListSource::PLAYLIST;
   } else if (parse_result->count("q")) {
-    view = CmusClient::View::QUEUE;
+    source = CmusClient::MetadataListSource::QUEUE;
   } else {
     ShowHelp(options, 1);
   }
-  PrintList(std::move(interface), passwd, view);
+  PrintList(std::move(interface), passwd, source);
 
   return 0;
 }

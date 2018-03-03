@@ -182,7 +182,7 @@ TEST_F(CmusClientTest, GetList_empty) {
 
   ExpectSendAndReply("save -l -e -\n", "");
   std::vector<Metadata> metadata_list =
-      client.GetList(CmusClient::View::LIBRARY);
+      client.GetMetadataList(CmusClient::MetadataListSource::LIBRARY);
 
   EXPECT_EQ(0u, metadata_list.size());
 }
@@ -193,7 +193,7 @@ TEST_F(CmusClientTest, GetList_returnsTwoRecords) {
 
   ExpectSendAndReply("save -l -e -\n", kListText);
   std::vector<Metadata> metadata_list =
-      client.GetList(CmusClient::View::LIBRARY);
+      client.GetMetadataList(CmusClient::MetadataListSource::LIBRARY);
 
   EXPECT_EQ(2u, metadata_list.size());
   EXPECT_EQ(318, metadata_list[0].duration);

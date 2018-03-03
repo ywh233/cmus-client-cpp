@@ -18,6 +18,16 @@ namespace cmusclient {
 class CmusClient {
  public:
   enum class View {
+    LIBRARY = 1,
+    SORTED_LIBRARY = 2,
+    PLAYLIST = 3,
+    PLAY_QUEUE = 4,
+    BROWSER = 5,
+    FILTERS = 6,
+    SETTINGS = 7,
+  };
+
+  enum class MetadataListSource {
     LIBRARY,
     FILTERED_LIBRARY,
     PLAYLIST,
@@ -40,7 +50,9 @@ class CmusClient {
 
   Status GetStatus();
 
-  std::vector<Metadata> GetList(View view);
+  void GoToView(View view);
+
+  std::vector<Metadata> GetMetadataList(MetadataListSource source);
 
   void Play();
   void Pause();
