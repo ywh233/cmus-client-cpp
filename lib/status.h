@@ -21,12 +21,17 @@ struct Status {
     PAUSED,
   };
 
+  const unsigned int kMaxVolume = 100u;
+
   static Status ParseStatus(const std::string& str);
+
+  unsigned int GetLeftVolume() const;
+  unsigned int GetRightVolume() const;
 
   PlayerStatus status = PlayerStatus::STOPPED;
   std::string filename;
-  int duration = 0;
-  int position = 0;
+  unsigned int duration = 0;
+  unsigned int position = 0;
 
   Tags tags;
 

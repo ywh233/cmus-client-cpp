@@ -15,9 +15,9 @@ namespace cmusclient {
 
 struct Metadata {
   std::string filename;
-  int duration = 0;
+  unsigned int duration = 0;
   std::string codec;
-  int bitrate = 0;
+  unsigned int bitrate = 0;
   Tags tags;
 
   static std::vector<Metadata> ParseMetadataList(const std::string& str);

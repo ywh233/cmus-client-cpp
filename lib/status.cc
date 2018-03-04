@@ -38,8 +38,18 @@ void SetPlayerStatus(Status* status, const std::string& player_status) {
   }
 }
 
+unsigned int GetVolume(const std::map<std::string, std::string>& settings,
+                       const std::string& key) {
+  auto vol_setting = settings.find(key);
+  if (vol_setting == settings.cend()) {
+    return 0;
+  }
+  return std::stoi(vol_setting->second);
+}
+
 }  // namespace
 
+// static
 Status Status::ParseStatus(const std::string& str) {
   std::istringstream stream(str);
   std::string line;
@@ -80,6 +90,14 @@ Status Status::ParseStatus(const std::string& str) {
     }
   }
   return status;
+}
+
+unsigned int Status::GetLeftVolume() const {
+  return GetVolume(settings, "vol_left");
+}
+
+unsigned int Status::GetRightVolume() const {
+  return GetVolume(settings, "vol_right");
 }
 
 }  // namespace cmusclient
