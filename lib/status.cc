@@ -50,6 +50,9 @@ unsigned int GetVolume(const std::map<std::string, std::string>& settings,
 }  // namespace
 
 // static
+const unsigned int Status::kMaxVolume = 100u;
+
+// static
 Status Status::ParseStatus(const std::string& str) {
   std::istringstream stream(str);
   std::string line;

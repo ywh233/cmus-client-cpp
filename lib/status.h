@@ -21,7 +21,7 @@ struct Status {
     PAUSED,
   };
 
-  const unsigned int kMaxVolume = 100u;
+  static const unsigned int kMaxVolume;
 
   static Status ParseStatus(const std::string& str);
 
